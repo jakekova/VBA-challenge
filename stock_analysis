@@ -1,0 +1,108 @@
+Sub stock_analysis()
+
+For Each ws In Worksheets
+  
+Dim ticker_name As String
+Dim stock_total As Double
+stock_total = 0
+
+Dim ticker_name_row As Integer
+Dim stockV_row As Integer
+Dim Ychange_row As Integer
+Dim Pchange_row As Integer
+
+Dim open_share As Double
+open_share = 0
+
+Dim close_share As Double
+close_share = 0
+
+Dim Ychange As Double
+Ychange = 0
+
+Dim Pchange As Double
+Pchange = 0
+
+Dim GreatInc As Double
+Dim GreatDec As Double
+Dim GreatV As Double
+GreatInc = 0
+GreatDec = 0
+GreatV = 0
+
+
+LastRow = ws.Cells(Rows.Count, 1).End(xlUp).Row
+
+ticker_name_row = 2
+stockV_row = 2
+Ychange_row = 2
+Pchange_row = 2
+
+Dim counter As Double
+counter = 0
+
+For i = 2 To LastRow
+    
+If ws.Cells(i + 1, 1).Value <> ws.Cells(i, 1).Value Then
+    ticker_name = ws.Cells(i, 1).Value
+    
+    ws.Range("I" & ticker_name_row).Value = ticker_name
+    ticker_name_row = ticker_name_row + 1
+   
+    stock_total = stock_total + ws.Cells(i, 7).Value
+    
+    ws.Range("L" & stockV_row).Value = stock_total
+    stockV_row = stockV_row + 1
+    
+    
+    closed_share = ws.Cells(i, 6).Value
+    open_share = ws.Cells(i - counter, 3).Value
+    Ychange = closed_share - open_share
+    ws.Range("J" & Ychange_row) = Ychange
+    
+    counter = 0
+        
+        If Ychange > 0 Then
+        ws.Range("J" & Ychange_row).Interior.ColorIndex = 4
+        
+        ElseIf Ychange < 0 Then
+        ws.Range("J" & Ychange_row).Interior.ColorIndex = 3
+    
+        End If
+    
+    Ychange_row = Ychange_row + 1
+    
+    Pchange = ((closed_share - open_share) / open_share)
+    ws.Range("K" & Pchange_row) = FormatPercent(Pchange)
+    Pchange_row = Pchange_row + 1
+    
+            If Pchange > GreatInc Then
+            GreatInc = Pchange
+            ws.Range("P2") = ticker_name
+            ws.Range("Q2") = FormatPercent(GreatInc)
+            ElseIf Pchange < GreatDec Then
+            GreatDec = Pchange
+            ws.Range("P3") = ticker_name
+            ws.Range("Q3") = FormatPercent(GreatDec)
+            End If
+            
+            If stock_total > GreatV Then
+            GreatV = stock_total
+            ws.Range("P4") = ticker_name
+            ws.Range("Q4") = GreatV
+            End If
+            
+    stock_total = 0
+
+        
+Else
+    stock_total = stock_total + ws.Cells(i, 7).Value
+    counter = counter + 1
+
+End If
+
+Next i
+
+Next ws
+
+End Sub
